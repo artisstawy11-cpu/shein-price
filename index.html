@@ -137,6 +137,7 @@ textarea{width:100%;min-height:420px;font:inherit;font-size:.95rem;line-height:1
 const $=id=>document.getElementById(id);
 const WALLET="+201133521741";
 const INSTA="https://ipn.eg/S/nouuur/instapay/0OaU2B";
+const IPA="nouuur@instapay";
 let items=[{name:"فستان",price:59,qty:1},{name:"بلوزة",price:32,qty:2}];
 let seq=0;
 
@@ -211,8 +212,7 @@ function buildMsg(rates,bank,profit,step){
     m+=`\n${ic} ديبوزيت ${dep}% (الريال بـ ${fmt(rate)})\n${body}💰 الإجمالي: ${fmt(total)} جنيه\n`;
     m+=dep===100?`✅ تدفعي الطلب كامل: ${fmt(depAmt)} جنيه\n`:`✅ تدفعي الآن: ${fmt(depAmt)} جنيه\n⏳ الباقي عند الاستلام: ${fmt(rem)} جنيه\n`;
   });
-  m+=`\n✔️ شامل زيادة ${fmt(profit*100)}% على القطعة`;
-  m+=`\n\n🚚 الشحن البري يوصل خلال ${days} يوم\n\n💳 طرق الدفع:\n🔹 محفظة:\n${WALLET}\n\n🔹 انستا باي (اضغطي على اللينك):\n${INSTA}\n\nبرجاء إرسال صورة التحويل بعد الدفع لتأكيد الطلب 🤍`;
+  m+=`\n🚚 الشحن البري يوصل خلال ${days} يوم\n\n💳 طرق الدفع:\n🔹 محفظة:\n${WALLET}\n\n🔹 انستا باي (اضغطي على اللينك):\n${INSTA}\nلو اللينك مفتحش، حوّلي من تطبيق انستا باي على:\n${IPA}\n\nبرجاء إرسال صورة التحويل بعد الدفع لتأكيد الطلب 🤍`;
   $("msg").value=m;
   $("wa").href="https://wa.me/?text="+encodeURIComponent(m);
 }
