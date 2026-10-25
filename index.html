@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حاسبة طلبات شي إن</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;700&display=swap">
+<style>
+/* Layout: two-column workbench — inputs on the right (RTL start), live message on the left; stacks on phone */
+:root{
+  --bg:#f6f3f5; --surface:#ffffff; --fg:#231a21; --muted:#6f6470; --line:#e4dbe2;
+  --accent:#8a2a5c; --accent-soft:#f3e3ec; --ok:#1d7a52; --field:#fbf9fa;
+  --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#18131a; --surface:#221b24; --fg:#f2eaf0; --muted:#a99cab; --line:#3a2f3c;
+  --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --field:#1c161e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#18131a; --surface:#221b24; --fg:#f2eaf0; --muted:#a99cab; --line:#3a2f3c;
+  --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --field:#1c161e; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header h1{font-family:var(--f-display);font-weight:700;font-size:1.7rem;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.formula{display:inline-block;margin-top:10px;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:.9rem;font-weight:500}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel h2{font-family:var(--f-display);font-size:1.05rem;font-weight:500;margin:0;color:var(--accent)}
+label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+input:focus,select:focus,button:focus-visible,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+input[type=number]{font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+.row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.deps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dep{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--field);cursor:pointer;text-align:center;display:flex;flex-direction:column;gap:2px}
+.dep input{display:none}
+.dep b{font-family:var(--f-display);font-size:1.1rem}
+.dep span{font-size:.8rem;color:var(--muted)}
+.dep:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.dep:has(input:checked) b{color:var(--accent)}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:grid;grid-template-columns:1fr 110px 70px auto;gap:8px;align-items:end}
+@media (max-width:480px){.item{grid-template-columns:1fr 1fr 70px}.item .name{grid-column:1/-1}}
+.item .unit{grid-column:1/-1;font-size:.82rem;color:var(--muted);margin-top:-4px}
+.item + .item{border-top:1px dashed var(--line);padding-top:10px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--field);color:var(--fg);padding:8px 12px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+button.ghost{background:transparent}
+.del{padding:8px 10px;color:var(--muted)}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:480px){.sum{grid-template-columns:1fr}}
+.sum div{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px}
+.sum small{color:var(--muted);display:block;font-size:.8rem}
+.sum strong{font-family:var(--f-display);font-size:1.3rem;font-variant-numeric:tabular-nums}
+.sum .hl{border-color:var(--accent);background:var(--accent-soft)}
+.sum .hl strong{color:var(--accent)}
+details{font-size:.88rem;color:var(--muted)}
+details summary{cursor:pointer}
+.bd{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin-top:8px;font-variant-numeric:tabular-nums}
+.bd span:nth-child(even){text-align:left;color:var(--fg)}
+textarea{width:100%;min-height:420px;font:inherit;font-size:.95rem;line-height:1.75;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:12px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.actions a{text-decoration:none}
+.toast{color:var(--ok);font-size:.88rem}
+.note{font-size:.82rem;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+
+<div class="wrap" dir="rtl" lang="ar">
+  <header>
+    <h1>حاسبة طلبات شي إن</h1>
+    <p>اكتبي سعر القطع بالريال، اختاري نظام الديبوزيت، والرسالة بتتجهز للعميلة تلقائيًا.</p>
+    <div class="formula">السعر بالجنيه = سعر القطعة بالريال × (1 + عمولة البنك) × (1 + الربح) × سعر الريال</div>
+  </header>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>بيانات الطلب</h2>
+      <div class="row">
+        <div><label for="cname">اسم العميلة (اختياري)</label><input id="cname" placeholder="مثال: منى"></div>
+        <div><label for="bank">عمولة تحويل البنك %</label><input id="bank" type="number" step="0.1" min="0" value="6"></div>
+        <div><label for="profit">نسبة الربح %</label><input id="profit" type="number" step="1" min="0" value="25"></div>
+      </div>
+
+      <div>
+        <label>نظام الديبوزيت</label>
+        <div class="deps">
+          <label class="dep"><input type="radio" name="dep" value="100" checked><b>100%</b><span>الريال بـ <em id="r100l">13</em></span></label>
+          <label class="dep"><input type="radio" name="dep" value="75"><b>75%</b><span>الريال بـ <em id="r75l">14</em></span></label>
+          <label class="dep"><input type="radio" name="dep" value="50"><b>50%</b><span>الريال بـ <em id="r50l">15</em></span></label>
+        </div>
+      </div>
+
+      <div class="items" id="items"></div>
+      <div class="actions"><button class="ghost" id="add">+ إضافة قطعة</button></div>
+
+      <div class="sum">
+        <div class="hl"><small>إجمالي الطلب</small><strong id="tTotal">0</strong></div>
+        <div><small>المطلوب دفعه الآن</small><strong id="tDep">0</strong></div>
+        <div><small>الباقي عند الاستلام</small><strong id="tRem">0</strong></div>
+      </div>
+
+      <details>
+        <summary>الإعدادات والتفاصيل الداخلية (لا تظهر للعميلة)</summary>
+        <div class="row" style="margin-top:10px">
+          <div><label for="r100">سعر الريال — 100%</label><input id="r100" type="number" step="0.1" value="13"></div>
+          <div><label for="r75">سعر الريال — 75%</label><input id="r75" type="number" step="0.1" value="14"></div>
+          <div><label for="r50">سعر الريال — 50%</label><input id="r50" type="number" step="0.1" value="15"></div>
+          <div><label for="round">تقريب سعر القطعة</label>
+            <select id="round"><option value="1">لأقرب جنيه (لأعلى)</option><option value="5" selected>لأقرب 5 جنيه (لأعلى)</option><option value="10">لأقرب 10 جنيه (لأعلى)</option><option value="0">بدون تقريب</option></select></div>
+          <div><label for="days">مدة الشحن البري (يوم)</label><input id="days" type="number" value="30"></div>
+        </div>
+        <div class="bd" id="bd"></div>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2>رسالة العميلة</h2>
+      <textarea id="msg" aria-label="نص الرسالة"></textarea>
+      <div class="actions">
+        <button class="primary" id="copy">نسخ الرسالة</button>
+        <a id="wa" target="_blank" rel="noopener"><button type="button" tabindex="-1">فتح في واتساب</button></a>
+        <span class="toast" id="toast" hidden>تم النسخ ✓</span>
+      </div>
+      <p class="note">تقدري تعدّلي في نص الرسالة قبل النسخ. أي تغيير في الأرقام يعيد كتابة الرسالة من جديد.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const WALLET="+201133521741";
+const INSTA="https://ipn.eg/S/nouuur/instapay/0OaU2B";
+let items=[{name:"فستان",price:59,qty:1},{name:"بلوزة",price:32,qty:2}];
+let seq=0;
+
+const fmt=n=>Number(n).toLocaleString("en-US",{maximumFractionDigits:2});
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+
+function renderItems(){
+  const box=$("items");box.innerHTML="";
+  items.forEach((it,i)=>{
+    const id=seq++;
+    const d=document.createElement("div");d.className="item";
+    d.innerHTML=`<div class="name"><label for="n${id}">القطعة ${i+1}</label><input id="n${id}" placeholder="اسم القطعة (اختياري)"></div>
+      <div><label for="p${id}">السعر بالريال</label><input id="p${id}" type="number" min="0" step="0.01"></div>
+      <div><label for="q${id}">العدد</label><input id="q${id}" type="number" min="1" step="1"></div>
+      <button class="del" title="حذف القطعة" aria-label="حذف القطعة">✕</button>
+      <div class="unit" id="u${id}"></div>`;
+    box.appendChild(d);
+    const n=d.querySelector("#n"+id),p=d.querySelector("#p"+id),q=d.querySelector("#q"+id);
+    n.value=it.name;p.value=it.price||"";q.value=it.qty;
+    n.oninput=()=>{it.name=n.value;calc()};
+    p.oninput=()=>{it.price=num(p.value);calc()};
+    q.oninput=()=>{it.qty=Math.max(1,Math.round(num(q.value))||1);calc()};
+    d.querySelector(".del").onclick=()=>{items.splice(i,1);if(!items.length)items.push({name:"",price:0,qty:1});renderItems()};
+    it._u="u"+id;
+  });
+  calc();
+}
+
+function roundUp(v,step){return step>0?Math.ceil(v/step-1e-9)*step:Math.round(v*100)/100}
+
+function calc(){
+  const dep=+document.querySelector('input[name=dep]:checked').value;
+  const rates={100:num($("r100").value),75:num($("r75").value),50:num($("r50").value)};
+  ["100","75","50"].forEach(k=>$("r"+k+"l").textContent=fmt(rates[k]));
+  const rate=rates[dep],bank=num($("bank").value)/100,profit=num($("profit").value)/100,step=+$("round").value;
+  let total=0,sar=0,sarBank=0,sarProfit=0;
+  const lines=[];
+  items.forEach((it,i)=>{
+    const unit=it.price>0?roundUp(it.price*(1+bank)*(1+profit)*rate,step):0;
+    const line=unit*it.qty;total+=line;
+    sar+=it.price*it.qty;sarBank+=it.price*bank*it.qty;sarProfit+=it.price*(1+bank)*profit*it.qty;
+    const u=$(it._u);if(u)u.textContent=it.price>0?`سعر القطعة للعميلة: ${fmt(unit)} ج.م${it.qty>1?` × ${it.qty} = ${fmt(line)} ج.م`:""}`:"";
+    if(it.price>0)lines.push({name:it.name.trim()||`قطعة ${i+1}`,unit,qty:it.qty,line});
+  });
+  const depAmt=Math.ceil(total*dep/100),rem=total-depAmt;
+  $("tTotal").textContent=fmt(total)+" ج.م";$("tDep").textContent=fmt(depAmt)+" ج.م";$("tRem").textContent=fmt(rem)+" ج.م";
+  const raw=(sar+sarBank+sarProfit)*rate;
+  $("bd").innerHTML=`<span>إجمالي القطع بالريال</span><span>${fmt(sar)} ر.س</span>
+    <span>عمولة البنك</span><span>${fmt(sarBank)} ر.س</span>
+    <span>الربح</span><span>${fmt(sarProfit)} ر.س ≈ ${fmt(sarProfit*rate)} ج.م</span>
+    <span>سعر الريال المستخدم</span><span>${fmt(rate)}</span>
+    <span>الإجمالي قبل التقريب</span><span>${fmt(raw)} ج.م</span>
+    <span>فرق التقريب</span><span>${fmt(total-raw)} ج.م</span>`;
+  buildMsg(rates,bank,profit,step);
+  save();
+}
+
+function buildMsg(rates,bank,profit,step){
+  const name=$("cname").value.trim();
+  const days=num($("days").value)||30;
+  const valid=items.map((it,i)=>({it,i})).filter(x=>x.it.price>0);
+  let m=`✨ أهلًا${name?" "+name:""} ✨\nده تفاصيل طلبك من شي إن، واختاري نظام الدفع اللي يناسبك:\n`;
+  if(!valid.length)m+="\n(لسه مفيش منتجات)\n";
+  [[100,"1️⃣"],[75,"2️⃣"],[50,"3️⃣"]].forEach(([dep,ic])=>{
+    const rate=rates[dep];let total=0;let body="";
+    valid.forEach(({it,i})=>{
+      const unit=roundUp(it.price*(1+bank)*(1+profit)*rate,step),line=unit*it.qty;total+=line;
+      body+=`▫️ ${it.name.trim()||"قطعة "+(i+1)}: ${fmt(unit)} ج.م${it.qty>1?` × ${it.qty} = ${fmt(line)} ج.م`:""}\n`;
+    });
+    if(!valid.length)return;
+    const depAmt=Math.ceil(total*dep/100),rem=total-depAmt;
+    m+=`\n${ic} ديبوزيت ${dep}% (الريال بـ ${fmt(rate)})\n${body}💰 الإجمالي: ${fmt(total)} جنيه\n`;
+    m+=dep===100?`✅ تدفعي الطلب كامل: ${fmt(depAmt)} جنيه\n`:`✅ تدفعي الآن: ${fmt(depAmt)} جنيه\n⏳ الباقي عند الاستلام: ${fmt(rem)} جنيه\n`;
+  });
+  m+=`\n✔️ شامل زيادة ${fmt(profit*100)}% على القطعة`;
+  m+=`\n\n🚚 الشحن البري يوصل خلال ${days} يوم\n\n💳 طرق الدفع:\n🔹 محفظة:\n${WALLET}\n\n🔹 انستا باي (اضغطي على اللينك):\n${INSTA}\n\nبرجاء إرسال صورة التحويل بعد الدفع لتأكيد الطلب 🤍`;
+  $("msg").value=m;
+  $("wa").href="https://wa.me/?text="+encodeURIComponent(m);
+}
+
+$("copy").onclick=()=>{
+  const t=$("msg"),done=()=>{$("toast").hidden=false;setTimeout(()=>$("toast").hidden=true,1800)};
+  const fallback=()=>{t.select();try{document.execCommand("copy");done()}catch(e){}};
+  try{navigator.clipboard.writeText(t.value).then(done,fallback)}catch(e){fallback()}
+};
+$("msg").addEventListener("input",()=>{$("wa").href="https://wa.me/?text="+encodeURIComponent($("msg").value)});
+$("add").onclick=()=>{items.push({name:"",price:0,qty:1});renderItems()};
+["cname","bank","profit","r100","r75","r50","round","days"].forEach(id=>$(id).addEventListener("input",calc));
+document.querySelectorAll('input[name=dep]').forEach(r=>r.addEventListener("change",calc));
+
+const KEY="sheinCalcSettings";
+function save(){try{localStorage.setItem(KEY,JSON.stringify({bank:$("bank").value,profit:$("profit").value,r100:$("r100").value,r75:$("r75").value,r50:$("r50").value,round:$("round").value,days:$("days").value}))}catch(e){}}
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)Object.keys(s).forEach(k=>{if($(k)&&s[k]!=null)$(k).value=s[k]})}catch(e){}
+renderItems();
+</script>
+</body>
+</html>
