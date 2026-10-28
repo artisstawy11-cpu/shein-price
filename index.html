@@ -7,40 +7,42 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;700&display=swap">
 <style>
-/* Layout: two-column workbench — inputs on the right (RTL start), live message on the left; stacks on phone */
+/* Layout: customer tabs on top, two-column workbench (inputs | live message), settings drawer for prices + payment data */
 :root{
   --bg:#f6f3f5; --surface:#ffffff; --fg:#231a21; --muted:#6f6470; --line:#e4dbe2;
-  --accent:#8a2a5c; --accent-soft:#f3e3ec; --ok:#1d7a52; --field:#fbf9fa;
+  --accent:#8a2a5c; --accent-soft:#f3e3ec; --ok:#1d7a52; --danger:#b3261e; --field:#fbf9fa;
   --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#18131a; --surface:#221b24; --fg:#f2eaf0; --muted:#a99cab; --line:#3a2f3c;
-  --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --field:#1c161e; color-scheme:dark}}
+  --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --danger:#ff8a80; --field:#1c161e; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#18131a; --surface:#221b24; --fg:#f2eaf0; --muted:#a99cab; --line:#3a2f3c;
-  --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --field:#1c161e; color-scheme:dark}
+  --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --danger:#ff8a80; --field:#1c161e; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
-.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
 header h1{font-family:var(--f-display);font-weight:700;font-size:1.7rem;margin:0;text-wrap:balance}
 header p{margin:4px 0 0;color:var(--muted)}
-.formula{display:inline-block;margin-top:10px;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:.9rem;font-weight:500}
 .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start}
 @media (max-width:860px){.grid{grid-template-columns:1fr}}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px;min-width:0}
 .panel h2{font-family:var(--f-display);font-size:1.05rem;font-weight:500;margin:0;color:var(--accent)}
+.panel h3{font-size:.95rem;font-weight:600;margin:0}
 label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px}
 input,select{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 input:focus,select:focus,button:focus-visible,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
 input[type=number]{font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
-.row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+input.ltr{direction:ltr;text-align:right}
+.row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
 .deps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.dep{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--field);cursor:pointer;text-align:center;display:flex;flex-direction:column;gap:2px}
+.dep{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--field);cursor:pointer;text-align:center;display:flex;flex-direction:column;gap:2px;margin:0}
 .dep input{display:none}
-.dep b{font-family:var(--f-display);font-size:1.1rem}
-.dep span{font-size:.8rem;color:var(--muted)}
+.dep b{font-family:var(--f-display);font-size:1.1rem;color:var(--fg)}
+.dep span{font-size:.8rem}
 .dep:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
 .dep:has(input:checked) b{color:var(--accent)}
 .items{display:flex;flex-direction:column;gap:10px}
@@ -51,7 +53,15 @@ input[type=number]{font-variant-numeric:tabular-nums;direction:ltr;text-align:ri
 button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--field);color:var(--fg);padding:8px 12px}
 button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
 button.ghost{background:transparent}
+button.danger{color:var(--danger);border-color:var(--danger);background:transparent}
 .del{padding:8px 10px;color:var(--muted)}
+/* customer tabs */
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.tab{flex:none;display:flex;align-items:center;gap:6px;border-radius:999px;padding:7px 14px;background:var(--surface);border:1px solid var(--line);color:var(--fg);white-space:nowrap}
+.tab small{color:var(--muted);font-variant-numeric:tabular-nums}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tab[aria-selected="true"] small{color:var(--surface);opacity:.85}
+.tab.add{border-style:dashed;color:var(--accent);background:transparent}
 .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media (max-width:480px){.sum{grid-template-columns:1fr}}
 .sum div{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px}
@@ -63,35 +73,78 @@ details{font-size:.88rem;color:var(--muted)}
 details summary{cursor:pointer}
 .bd{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin-top:8px;font-variant-numeric:tabular-nums}
 .bd span:nth-child(even){text-align:left;color:var(--fg)}
-textarea{width:100%;min-height:420px;font:inherit;font-size:.95rem;line-height:1.75;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:12px;resize:vertical}
+textarea{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
+#msg{min-height:440px;font-size:.95rem;line-height:1.75}
+#note{min-height:70px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .actions a{text-decoration:none}
 .toast{color:var(--ok);font-size:.88rem}
 .note{font-size:.82rem;color:var(--muted);margin:0}
+.settings{border-color:var(--accent)}
+.settings .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.settings .cols{grid-template-columns:1fr}}
+.settings .cols > div{display:flex;flex-direction:column;gap:12px;min-width:0}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.88rem}
 </style>
 </head>
 <body>
 
 <div class="wrap" dir="rtl" lang="ar">
   <header>
-    <h1>حاسبة طلبات شي إن</h1>
-    <p>اكتبي سعر القطع بالريال، اختاري نظام الديبوزيت، والرسالة بتتجهز للعميلة تلقائيًا.</p>
-    <div class="formula">السعر بالجنيه = سعر القطعة بالريال × (1 + عمولة البنك) × (1 + الربح) × سعر الريال</div>
+    <div>
+      <h1>حاسبة طلبات شي إن</h1>
+      <p>كل عميلة في صفحة لوحدها. اكتبي أسعار القطع بالريال، والرسالة بتتجهز تلقائيًا.</p>
+    </div>
+    <button id="openSettings" aria-expanded="false">⚙️ الإعدادات وبيانات الدفع</button>
   </header>
+
+  <section class="panel settings" id="settings" hidden>
+    <div class="actions" style="justify-content:space-between">
+      <h2>الإعدادات وبيانات الدفع</h2>
+      <button class="ghost" id="closeSettings">تم ✓</button>
+    </div>
+    <div class="cols">
+      <div>
+        <h3>💳 بيانات الدفع (بتظهر في الرسالة)</h3>
+        <div><label for="wallet">رقم المحفظة</label><input id="wallet" class="ltr" inputmode="tel"></div>
+        <div><label for="insta">لينك انستا باي</label><input id="insta" class="ltr" inputmode="url"></div>
+        <div><label for="ipa">عنوان انستا باي</label><input id="ipa" class="ltr"></div>
+        <div><label for="note">سطر إضافي في آخر الرسالة (اختياري)</label><textarea id="note" placeholder="مثال: 🎁 لفترة محدودة: هدية مع كل أوردر!"></textarea></div>
+        <p class="note">لو سبتي أي خانة فاضية، مش هتظهر في الرسالة.</p>
+      </div>
+      <div>
+        <h3>💰 الأسعار</h3>
+        <div class="row">
+          <div><label for="r100">سعر الريال، ديبوزيت 100%</label><input id="r100" type="number" step="0.1"></div>
+          <div><label for="r75">سعر الريال، ديبوزيت 75%</label><input id="r75" type="number" step="0.1"></div>
+          <div><label for="r50">سعر الريال، ديبوزيت 50%</label><input id="r50" type="number" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div><label for="bank">عمولة تحويل البنك %</label><input id="bank" type="number" step="0.1" min="0"></div>
+          <div><label for="profit">نسبة الربح %</label><input id="profit" type="number" step="1" min="0"></div>
+          <div><label for="days">مدة الشحن البري (يوم)</label><input id="days" type="number"></div>
+        </div>
+        <div><label for="round">تقريب سعر القطعة</label>
+          <select id="round"><option value="1">لأقرب جنيه (لأعلى)</option><option value="5">لأقرب 5 جنيه (لأعلى)</option><option value="10">لأقرب 10 جنيه (لأعلى)</option><option value="0">بدون تقريب</option></select></div>
+        <button class="ghost" id="resetSettings">رجّعي الإعدادات الأصلية</button>
+      </div>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="العميلات"></nav>
 
   <div class="grid">
     <section class="panel">
-      <h2>بيانات الطلب</h2>
-      <div class="row">
-        <div><label for="cname">اسم العميلة (اختياري)</label><input id="cname" placeholder="مثال: منى"></div>
-        <div><label for="bank">عمولة تحويل البنك %</label><input id="bank" type="number" step="0.1" min="0" value="6"></div>
-        <div><label for="profit">نسبة الربح %</label><input id="profit" type="number" step="1" min="0" value="25"></div>
+      <div class="actions" style="justify-content:space-between">
+        <h2>بيانات الطلب</h2>
+        <span id="delWrap"><button class="ghost" id="delCust">حذف العميلة</button></span>
       </div>
+      <div><label for="cname">اسم العميلة</label><input id="cname" placeholder="مثال: منى"></div>
 
       <div>
-        <label>نظام الديبوزيت</label>
+        <label>نظام الديبوزيت (للحساب اللي هنا، والرسالة بتعرض التلاتة)</label>
         <div class="deps">
-          <label class="dep"><input type="radio" name="dep" value="100" checked><b>100%</b><span>الريال بـ <em id="r100l">13</em></span></label>
+          <label class="dep"><input type="radio" name="dep" value="100"><b>100%</b><span>الريال بـ <em id="r100l">13</em></span></label>
           <label class="dep"><input type="radio" name="dep" value="75"><b>75%</b><span>الريال بـ <em id="r75l">14</em></span></label>
           <label class="dep"><input type="radio" name="dep" value="50"><b>50%</b><span>الريال بـ <em id="r50l">15</em></span></label>
         </div>
@@ -107,15 +160,7 @@ textarea{width:100%;min-height:420px;font:inherit;font-size:.95rem;line-height:1
       </div>
 
       <details>
-        <summary>الإعدادات والتفاصيل الداخلية (لا تظهر للعميلة)</summary>
-        <div class="row" style="margin-top:10px">
-          <div><label for="r100">سعر الريال — 100%</label><input id="r100" type="number" step="0.1" value="13"></div>
-          <div><label for="r75">سعر الريال — 75%</label><input id="r75" type="number" step="0.1" value="14"></div>
-          <div><label for="r50">سعر الريال — 50%</label><input id="r50" type="number" step="0.1" value="15"></div>
-          <div><label for="round">تقريب سعر القطعة</label>
-            <select id="round"><option value="1">لأقرب جنيه (لأعلى)</option><option value="5" selected>لأقرب 5 جنيه (لأعلى)</option><option value="10">لأقرب 10 جنيه (لأعلى)</option><option value="0">بدون تقريب</option></select></div>
-          <div><label for="days">مدة الشحن البري (يوم)</label><input id="days" type="number" value="30"></div>
-        </div>
+        <summary>التفاصيل الداخلية (لا تظهر للعميلة)</summary>
         <div class="bd" id="bd"></div>
       </details>
     </section>
@@ -135,23 +180,48 @@ textarea{width:100%;min-height:420px;font:inherit;font-size:.95rem;line-height:1
 
 <script>
 const $=id=>document.getElementById(id);
-const WALLET="+201133521741";
-const INSTA="https://ipn.eg/S/nouuur/instapay/0OaU2B";
-const IPA="nouuur@instapay";
-let items=[{name:"فستان",price:59,qty:1},{name:"بلوزة",price:32,qty:2}];
-let seq=0;
+const DEFAULTS={wallet:"+201133521741",insta:"https://ipn.eg/S/nouuur/instapay/0OaU2B",ipa:"nouuur@instapay",note:"",
+  r100:"13",r75:"14",r50:"15",bank:"6",profit:"25",days:"30",round:"5"};
+const SKEYS=Object.keys(DEFAULTS);
+const SKEY="sheinCalcSettings",CKEY="sheinCalcCustomers";
+const newCust=()=>({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:"",dep:100,items:[{name:"",price:0,qty:1}]});
+let customers=[{...newCust(),name:"منى (مثال)",items:[{name:"فستان",price:59,qty:1},{name:"بلوزة",price:32,qty:2}]}];
+let current=0,seq=0;
 
 const fmt=n=>Number(n).toLocaleString("en-US",{maximumFractionDigits:2});
 const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const cur=()=>customers[current];
+function settings(){const s={};SKEYS.forEach(k=>s[k]=$(k).value);return s}
+function roundUp(v,step){return step>0?Math.ceil(v/step-1e-9)*step:Math.round(v*100)/100}
+function params(){const s=settings();return{rates:{100:num(s.r100),75:num(s.r75),50:num(s.r50)},bank:num(s.bank)/100,profit:num(s.profit)/100,step:+s.round,days:num(s.days)||30,s}}
+function unitPrice(price,rate,p){return roundUp(price*(1+p.bank)*(1+p.profit)*rate,p.step)}
+function custTotal(c,p){const r=p.rates[c.dep];return c.items.reduce((t,it)=>t+(it.price>0?unitPrice(it.price,r,p)*it.qty:0),0)}
+
+function renderTabs(){
+  const p=params(),box=$("tabs");box.innerHTML="";
+  customers.forEach((c,i)=>{
+    const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");
+    b.setAttribute("aria-selected",i===current?"true":"false");
+    const t=custTotal(c,p);
+    b.innerHTML=`<span></span>${t?`<small>${fmt(t)} ج.م</small>`:""}`;
+    b.firstChild.textContent=c.name.trim()||`عميلة ${i+1}`;
+    b.onclick=()=>{current=i;renderAll()};
+    box.appendChild(b);
+  });
+  const a=document.createElement("button");a.className="tab add";a.textContent="+ عميلة جديدة";
+  a.onclick=()=>{customers.push(newCust());current=customers.length-1;renderAll();$("cname").focus()};
+  box.appendChild(a);
+  box.querySelector('[aria-selected="true"]')?.scrollIntoView({block:"nearest",inline:"nearest"});
+}
 
 function renderItems(){
-  const box=$("items");box.innerHTML="";
+  const box=$("items"),items=cur().items;box.innerHTML="";
   items.forEach((it,i)=>{
     const id=seq++;
     const d=document.createElement("div");d.className="item";
     d.innerHTML=`<div class="name"><label for="n${id}">القطعة ${i+1}</label><input id="n${id}" placeholder="اسم القطعة (اختياري)"></div>
-      <div><label for="p${id}">السعر بالريال</label><input id="p${id}" type="number" min="0" step="0.01"></div>
-      <div><label for="q${id}">العدد</label><input id="q${id}" type="number" min="1" step="1"></div>
+      <div><label for="p${id}">السعر بالريال</label><input id="p${id}" type="number" min="0" step="0.01" inputmode="decimal"></div>
+      <div><label for="q${id}">العدد</label><input id="q${id}" type="number" min="1" step="1" inputmode="numeric"></div>
       <button class="del" title="حذف القطعة" aria-label="حذف القطعة">✕</button>
       <div class="unit" id="u${id}"></div>`;
     box.appendChild(d);
@@ -166,23 +236,24 @@ function renderItems(){
   calc();
 }
 
-function roundUp(v,step){return step>0?Math.ceil(v/step-1e-9)*step:Math.round(v*100)/100}
+function renderAll(){
+  const c=cur();
+  $("cname").value=c.name;
+  document.querySelectorAll('input[name=dep]').forEach(r=>r.checked=+r.value===c.dep);
+  resetDel();
+  renderItems();
+}
 
 function calc(){
-  const dep=+document.querySelector('input[name=dep]:checked').value;
-  const rates={100:num($("r100").value),75:num($("r75").value),50:num($("r50").value)};
-  ["100","75","50"].forEach(k=>$("r"+k+"l").textContent=fmt(rates[k]));
-  const rate=rates[dep],bank=num($("bank").value)/100,profit=num($("profit").value)/100,step=+$("round").value;
+  const c=cur(),p=params(),rate=p.rates[c.dep];
+  ["100","75","50"].forEach(k=>$("r"+k+"l").textContent=fmt(p.rates[k]));
   let total=0,sar=0,sarBank=0,sarProfit=0;
-  const lines=[];
-  items.forEach((it,i)=>{
-    const unit=it.price>0?roundUp(it.price*(1+bank)*(1+profit)*rate,step):0;
-    const line=unit*it.qty;total+=line;
-    sar+=it.price*it.qty;sarBank+=it.price*bank*it.qty;sarProfit+=it.price*(1+bank)*profit*it.qty;
+  c.items.forEach(it=>{
+    const unit=it.price>0?unitPrice(it.price,rate,p):0,line=unit*it.qty;total+=line;
+    sar+=it.price*it.qty;sarBank+=it.price*p.bank*it.qty;sarProfit+=it.price*(1+p.bank)*p.profit*it.qty;
     const u=$(it._u);if(u)u.textContent=it.price>0?`سعر القطعة للعميلة: ${fmt(unit)} ج.م${it.qty>1?` × ${it.qty} = ${fmt(line)} ج.م`:""}`:"";
-    if(it.price>0)lines.push({name:it.name.trim()||`قطعة ${i+1}`,unit,qty:it.qty,line});
   });
-  const depAmt=Math.ceil(total*dep/100),rem=total-depAmt;
+  const depAmt=Math.ceil(total*c.dep/100),rem=total-depAmt;
   $("tTotal").textContent=fmt(total)+" ج.م";$("tDep").textContent=fmt(depAmt)+" ج.م";$("tRem").textContent=fmt(rem)+" ج.م";
   const raw=(sar+sarBank+sarProfit)*rate;
   $("bd").innerHTML=`<span>إجمالي القطع بالريال</span><span>${fmt(sar)} ر.س</span>
@@ -191,31 +262,49 @@ function calc(){
     <span>سعر الريال المستخدم</span><span>${fmt(rate)}</span>
     <span>الإجمالي قبل التقريب</span><span>${fmt(raw)} ج.م</span>
     <span>فرق التقريب</span><span>${fmt(total-raw)} ج.م</span>`;
-  buildMsg(rates,bank,profit,step);
+  buildMsg(p);
+  renderTabs();
   save();
 }
 
-function buildMsg(rates,bank,profit,step){
-  const name=$("cname").value.trim();
-  const days=num($("days").value)||30;
-  const valid=items.map((it,i)=>({it,i})).filter(x=>x.it.price>0);
+function buildMsg(p){
+  const c=cur(),s=p.s,name=c.name.replace(/\(مثال\)/,"").trim();
+  const valid=c.items.map((it,i)=>({it,i})).filter(x=>x.it.price>0);
   let m=`✨ أهلًا${name?" "+name:""} ✨\nده تفاصيل طلبك من شي إن، واختاري نظام الدفع اللي يناسبك:\n`;
   if(!valid.length)m+="\n(لسه مفيش منتجات)\n";
   [[100,"1️⃣"],[75,"2️⃣"],[50,"3️⃣"]].forEach(([dep,ic])=>{
-    const rate=rates[dep];let total=0;let body="";
+    if(!valid.length)return;
+    const rate=p.rates[dep];let total=0,body="";
     valid.forEach(({it,i})=>{
-      const unit=roundUp(it.price*(1+bank)*(1+profit)*rate,step),line=unit*it.qty;total+=line;
+      const unit=unitPrice(it.price,rate,p),line=unit*it.qty;total+=line;
       body+=`▫️ ${it.name.trim()||"قطعة "+(i+1)}: ${fmt(unit)} ج.م${it.qty>1?` × ${it.qty} = ${fmt(line)} ج.م`:""}\n`;
     });
-    if(!valid.length)return;
     const depAmt=Math.ceil(total*dep/100),rem=total-depAmt;
     m+=`\n${ic} ديبوزيت ${dep}% (الريال بـ ${fmt(rate)})\n${body}💰 الإجمالي: ${fmt(total)} جنيه\n`;
     m+=dep===100?`✅ تدفعي الطلب كامل: ${fmt(depAmt)} جنيه\n`:`✅ تدفعي الآن: ${fmt(depAmt)} جنيه\n⏳ الباقي عند الاستلام: ${fmt(rem)} جنيه\n`;
   });
-  m+=`\n🚚 الشحن البري يوصل خلال ${days} يوم\n\n💳 طرق الدفع:\n🔹 محفظة:\n${WALLET}\n\n🔹 انستا باي (اضغطي على اللينك):\n${INSTA}\nلو اللينك مفتحش، حوّلي من تطبيق انستا باي على:\n${IPA}\n\nبرجاء إرسال صورة التحويل بعد الدفع لتأكيد الطلب 🤍`;
+  m+=`\n🚚 الشحن البري يوصل خلال ${p.days} يوم\n`;
+  const wallet=s.wallet.replace(/\s+/g,""),insta=s.insta.trim(),ipa=s.ipa.trim();
+  if(wallet||insta||ipa){
+    m+=`\n💳 طرق الدفع:\n`;
+    if(wallet)m+=`🔹 محفظة:\n${wallet}\n`;
+    if(insta){m+=`${wallet?"\n":""}🔹 انستا باي (اضغطي على اللينك):\n${insta}\n`;if(ipa)m+=`لو اللينك مفتحش، حوّلي من تطبيق انستا باي على:\n${ipa}\n`}
+    else if(ipa)m+=`${wallet?"\n":""}🔹 انستا باي:\n${ipa}\n`;
+  }
+  if(s.note.trim())m+=`\n${s.note.trim()}\n`;
+  m+=`\nبرجاء إرسال صورة التحويل بعد الدفع لتأكيد الطلب 🤍`;
   $("msg").value=m;
   $("wa").href="https://wa.me/?text="+encodeURIComponent(m);
 }
+
+/* delete customer with inline confirm */
+function resetDel(){$("delWrap").innerHTML=`<button class="ghost" id="delCust">حذف العميلة</button>`;$("delCust").onclick=askDel}
+function askDel(){
+  $("delWrap").innerHTML=`<span class="confirm">متأكدة؟ <button class="danger" id="yesDel">احذفي</button><button class="ghost" id="noDel">إلغاء</button></span>`;
+  $("yesDel").onclick=()=>{customers.splice(current,1);if(!customers.length)customers.push(newCust());current=Math.min(current,customers.length-1);renderAll()};
+  $("noDel").onclick=resetDel;
+}
+resetDel();
 
 $("copy").onclick=()=>{
   const t=$("msg"),done=()=>{$("toast").hidden=false;setTimeout(()=>$("toast").hidden=true,1800)};
@@ -223,14 +312,23 @@ $("copy").onclick=()=>{
   try{navigator.clipboard.writeText(t.value).then(done,fallback)}catch(e){fallback()}
 };
 $("msg").addEventListener("input",()=>{$("wa").href="https://wa.me/?text="+encodeURIComponent($("msg").value)});
-$("add").onclick=()=>{items.push({name:"",price:0,qty:1});renderItems()};
-["cname","bank","profit","r100","r75","r50","round","days"].forEach(id=>$(id).addEventListener("input",calc));
-document.querySelectorAll('input[name=dep]').forEach(r=>r.addEventListener("change",calc));
+$("add").onclick=()=>{cur().items.push({name:"",price:0,qty:1});renderItems()};
+$("cname").addEventListener("input",()=>{cur().name=$("cname").value;calc()});
+document.querySelectorAll('input[name=dep]').forEach(r=>r.addEventListener("change",()=>{cur().dep=+r.value;calc()}));
+SKEYS.forEach(k=>$(k).addEventListener("input",calc));
+const toggleSettings=open=>{$("settings").hidden=!open;$("openSettings").setAttribute("aria-expanded",open)};
+$("openSettings").onclick=()=>toggleSettings($("settings").hidden);
+$("closeSettings").onclick=()=>toggleSettings(false);
+$("resetSettings").onclick=()=>{SKEYS.forEach(k=>$(k).value=DEFAULTS[k]);calc()};
 
-const KEY="sheinCalcSettings";
-function save(){try{localStorage.setItem(KEY,JSON.stringify({bank:$("bank").value,profit:$("profit").value,r100:$("r100").value,r75:$("r75").value,r50:$("r50").value,round:$("round").value,days:$("days").value}))}catch(e){}}
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)Object.keys(s).forEach(k=>{if($(k)&&s[k]!=null)$(k).value=s[k]})}catch(e){}
-renderItems();
+function save(){
+  try{localStorage.setItem(SKEY,JSON.stringify(settings()))}catch(e){}
+  try{localStorage.setItem(CKEY,JSON.stringify({current,customers:customers.map(c=>({id:c.id,name:c.name,dep:c.dep,items:c.items.map(({name,price,qty})=>({name,price,qty}))}))}))}catch(e){}
+}
+SKEYS.forEach(k=>$(k).value=DEFAULTS[k]);
+try{const s=JSON.parse(localStorage.getItem(SKEY)||"null");if(s)SKEYS.forEach(k=>{if(s[k]!=null)$(k).value=s[k]})}catch(e){}
+try{const d=JSON.parse(localStorage.getItem(CKEY)||"null");if(d&&Array.isArray(d.customers)&&d.customers.length){customers=d.customers;current=Math.min(d.current||0,customers.length-1)}}catch(e){}
+renderAll();
 </script>
 </body>
 </html>
