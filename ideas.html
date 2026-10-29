@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بنك أفكار شينوري</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ إعدادات ============ */
+:root{
+  --bg:#f7f4f0; --surface:#ffffff; --surface-2:#f1ece6; --text:#2a2420; --muted:#7a6f66;
+  --line:#e4ddd5; --accent:#9c6b4e; --accent-ink:#ffffff; --accent-soft:#f3e6dd;
+  --ok:#3f7d5a; --ok-soft:#e3f1e8; --lock:#6b6f7a; --lock-soft:#eceef2; --danger:#b04a3c;
+  --radius:14px; --shadow:0 1px 2px rgba(40,30,20,.06),0 4px 16px rgba(40,30,20,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#171412; --surface:#211d1a; --surface-2:#2a2522; --text:#f1ebe5; --muted:#a89d93;
+    --line:#3a332e; --accent:#d29b7a; --accent-ink:#1b1512; --accent-soft:#3a2a21;
+    --ok:#7cc79a; --ok-soft:#1f3329; --lock:#a3a8b4; --lock-soft:#2a2c31; --danger:#e07b6c;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px 64px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+h1{font-size:1.5rem;margin:0;font-weight:700}
+.sub{color:var(--muted);margin:2px 0 0;font-size:.92rem}
+.banner{background:var(--accent-soft);color:var(--text);border-radius:10px;padding:10px 14px;font-size:.88rem;margin-bottom:16px}
+.tabs{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:12px;margin-bottom:18px}
+.tab{flex:1;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+label .hint{font-weight:400;color:var(--muted);font-size:.82rem}
+input,textarea,select{width:100%;font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+textarea{min-height:96px;resize:vertical}
+input[type=url]{direction:ltr;text-align:left}
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.type-opt{position:relative}
+.type-opt input{position:absolute;opacity:0;pointer-events:none}
+.type-opt span{display:block;text-align:center;padding:10px 8px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--bg);font-weight:500}
+.type-opt input:checked + span{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.type-opt input:focus-visible + span{outline:2px solid var(--accent)}
+.link-row{display:flex;gap:8px;margin-bottom:8px}
+.icon-btn{flex:none;width:42px;border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:10px;cursor:pointer;font-size:1.1rem}
+.btn{border:0;border-radius:10px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:transparent;color:var(--accent);border:1px dashed var(--line)}
+.btn-sm{padding:6px 12px;font-size:.85rem;background:var(--surface-2);color:var(--text)}
+.btn-danger{color:var(--danger)}
+.btn:disabled{opacity:.6;cursor:wait}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters input{flex:1 1 200px}
+.filters select{flex:0 1 160px}
+.stats{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:.88rem;color:var(--muted)}
+.stat b{color:var(--text);font-size:1.05rem;margin-inline-start:4px}
+.list{display:grid;gap:12px}
+.idea{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.idea.used{background:var(--surface-2)}
+.idea-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.chip{font-size:.78rem;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--text);font-weight:600}
+.id{font-size:.78rem;color:var(--muted);direction:ltr}
+.status{margin-inline-start:auto;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.status.new{background:var(--ok-soft);color:var(--ok)}
+.status.used{background:var(--lock-soft);color:var(--lock)}
+.idea h3{margin:4px 0;font-size:1.05rem}
+.idea p{margin:4px 0;white-space:pre-wrap;color:var(--text)}
+.idea .notes{color:var(--muted);font-size:.9rem}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.links a{font-size:.82rem;padding:4px 10px;border-radius:8px;border:1px solid var(--line);color:var(--accent);text-decoration:none;background:var(--bg)}
+.meta{font-size:.8rem;color:var(--muted);margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.meta .row-actions{margin-inline-start:auto;display:flex;gap:6px}
+.lockline{font-size:.85rem;color:var(--lock);margin-top:8px}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:.92rem;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px)}
+.toast.show{opacity:1}
+.hidden{display:none !important}
+.editing{font-size:.88rem;background:var(--accent-soft);padding:8px 12px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>بنك أفكار شينوري</h1>
+      <p class="sub">ضيفي أي فكرة محتوى أو إلهام، مع اللينكات، وهنستخدمها في خطة المحتوى الجاية.</p>
+    </div>
+  </header>
+
+  <div id="demoBanner" class="banner hidden">وضع تجريبي: البيانات هنا للعرض فقط ولن تُحفظ. ضع رابط الـ Apps Script في <code>API_URL</code> لتفعيل الحفظ.</div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="add">إضافة فكرة</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="list">كل الأفكار <span id="tabCount"></span></button>
+  </div>
+
+  <!-- ===== الفورم ===== -->
+  <section id="tab-add">
+    <form id="ideaForm" class="card" novalidate>
+      <div id="editingNote" class="editing hidden"><span>بتعدلي فكرة <b id="editingId"></b></span><button type="button" class="btn btn-sm" id="cancelEdit">إلغاء التعديل</button></div>
+
+      <label>نوع الفكرة</label>
+      <div class="types" id="types"></div>
+
+      <label for="title">عنوان الفكرة <span class="hint">(جملة قصيرة)</span></label>
+      <input id="title" maxlength="120" placeholder="مثال: لبس متشابه للزوجين في خروجة الويكند" required>
+
+      <label for="description">التفاصيل <span class="hint">(اشرحي الفكرة زي ما تتخيليها)</span></label>
+      <textarea id="description" maxlength="3000" placeholder="مثال: كاروسيل 5 صور، كل صورة لوك مختلف بنفس الألوان للزوج والزوجة…"></textarea>
+
+      <label>اللينكات <span class="hint">(إنستجرام، تيك توك، بنترست، أي مرجع)</span></label>
+      <div id="links"></div>
+      <button type="button" class="btn btn-ghost" id="addLink">+ إضافة لينك</button>
+
+      <label for="notes">ملاحظات إضافية <span class="hint">(اختياري: مناسبة، موعد، منتج معيّن)</span></label>
+      <input id="notes" maxlength="500" placeholder="مثال: يا ريت تنزل قبل اليوم الوطني">
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit" id="submitBtn">حفظ الفكرة</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===== القائمة ===== -->
+  <section id="tab-list" class="hidden">
+    <div class="stats" id="stats"></div>
+    <div class="filters">
+      <input id="search" type="search" placeholder="ابحثي في الأفكار…">
+      <select id="fType"><option value="">كل الأنواع</option></select>
+      <select id="fStatus">
+        <option value="">كل الحالات</option>
+        <option value="جديدة">جديدة</option>
+        <option value="مستخدمة">مستخدمة</option>
+      </select>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =====================================================
+   الإعداد الوحيد المطلوب: ضع رابط الـ Web App من Apps Script
+   ===================================================== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbxT_zTKBODaCEf0v_t84cBG60WDAS8SvW1YjjlzLPrAFFweHfYQe1JoWYd4vNQY5VFM/exec';
+
+const TYPES = ['كاروسيل','ريلز / فيديو','تنسيقات أزواج','ستوري / بوست','أخرى'];
+const USED = 'مستخدمة';
+const DEMO = !API_URL;
+
+let ideas = [];
+let editingId = null;
+const $ = s => document.querySelector(s);
+
+/* ---------- API ---------- */
+async function api(payload){
+  if (DEMO) return demoApi(payload);
+  if (!payload){
+    const r = await fetch(API_URL + '?t=' + Date.now());
+    return r.json();
+  }
+  // text/plain يمنع preflight مع Apps Script
+  const r = await fetch(API_URL, {method:'POST', body: JSON.stringify(payload)});
+  return r.json();
+}
+
+/* ---------- وضع تجريبي (في الذاكرة فقط) ---------- */
+let demoData = [
+  {id:'SH-001',created_at:'2026-10-20T10:00:00Z',type:'تنسيقات أزواج',title:'لبس متشابه للزوجين في خروجة الويكند',description:'كاروسيل لوكات بنفس درجات البيج والبني للزوج والزوجة.',links:['https://www.pinterest.com/pin/example1'],notes:'',status:'مستخدمة',used_in:'خطة نوفمبر 2026',used_at:'2026-10-25T00:00:00Z'},
+  {id:'SH-002',created_at:'2026-10-27T10:00:00Z',type:'ريلز / فيديو',title:'ريلز تحويل لوك الصبح للمساء',description:'نفس القطعة بطريقتين تنسيق.',links:['https://www.instagram.com/reel/example2'],notes:'',status:'جديدة',used_in:'',used_at:''}
+];
+function demoApi(p){
+  return new Promise(res => setTimeout(() => {
+    if (!p) return res({ok:true, ideas: JSON.parse(JSON.stringify(demoData))});
+    if (p.action === 'create'){
+      const n = demoData.reduce((m,i)=>Math.max(m, +i.id.split('-')[1]),0)+1;
+      demoData.push({...p.idea, id:'SH-'+String(n).padStart(3,'0'), created_at:new Date().toISOString(), status:'جديدة', used_in:'', used_at:''});
+      return res({ok:true});
+    }
+    const it = demoData.find(i => i.id === p.id);
+    if (!it) return res({ok:false, error:'الفكرة غير موجودة'});
+    if (it.status === USED) return res({ok:false, error:'الفكرة دي اتستخدمت ومقفولة، مينفعش تتعدل أو تتمسح.'});
+    if (p.action === 'update'){ Object.assign(it, p.idea); return res({ok:true}); }
+    if (p.action === 'delete'){ demoData = demoData.filter(i => i.id !== p.id); return res({ok:true}); }
+  }, 250));
+}
+
+/* ---------- أدوات ---------- */
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2800); }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function normLink(u){ try{ const x=new URL(u.trim()); return (x.hostname.replace(/^www\./,'')+x.pathname.replace(/\/+$/,'')).toLowerCase(); }catch{ return u.trim().toLowerCase(); } }
+function isUrl(u){ try{ const x=new URL(u); return x.protocol==='http:'||x.protocol==='https:'; }catch{ return false; } }
+function linkLabel(u){
+  try{ const h=new URL(u).hostname.replace(/^www\./,'');
+    if (/instagram/.test(h)) return 'Instagram'; if (/tiktok/.test(h)) return 'TikTok';
+    if (/pinterest|pin\.it/.test(h)) return 'Pinterest'; if (/youtu/.test(h)) return 'YouTube';
+    if (/snapchat/.test(h)) return 'Snapchat'; if (/(x|twitter)\.com/.test(h)) return 'X';
+    if (/drive\.google/.test(h)) return 'Google Drive'; return h;
+  }catch{ return 'لينك'; }
+}
+function fmtDate(d){ if(!d) return ''; const x=new Date(d); return isNaN(x)?'':x.toLocaleDateString('ar-EG',{day:'numeric',month:'short',year:'numeric'}); }
+
+/* ---------- الفورم ---------- */
+function buildTypes(){
+  $('#types').innerHTML = TYPES.map((t,i)=>`<label class="type-opt" style="margin:0"><input type="radio" name="type" value="${t}" ${i===0?'checked':''}><span>${t}</span></label>`).join('');
+  $('#fType').insertAdjacentHTML('beforeend', TYPES.map(t=>`<option>${t}</option>`).join(''));
+}
+function addLinkRow(val=''){
+  const row=document.createElement('div'); row.className='link-row';
+  row.innerHTML=`<input type="url" placeholder="https://" value="${esc(val)}"><button type="button" class="icon-btn" aria-label="حذف اللينك">×</button>`;
+  row.querySelector('button').onclick=()=>{ row.remove(); if(!$('#links').children.length) addLinkRow(); };
+  $('#links').appendChild(row);
+}
+function resetForm(){
+  $('#ideaForm').reset(); $('#links').innerHTML=''; addLinkRow();
+  editingId=null; $('#editingNote').classList.add('hidden'); $('#submitBtn').textContent='حفظ الفكرة';
+}
+function readForm(){
+  return {
+    type: (document.querySelector('input[name=type]:checked')||{}).value,
+    title: $('#title').value.trim(),
+    description: $('#description').value.trim(),
+    links: [...$('#links').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean),
+    notes: $('#notes').value.trim()
+  };
+}
+
+$('#ideaForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const idea = readForm();
+  if (!idea.title) return toast('اكتبي عنوان للفكرة'), $('#title').focus();
+  if (!idea.description && !idea.links.length) return toast('ضيفي تفاصيل أو لينك واحد على الأقل');
+  const bad = idea.links.find(l=>!isUrl(l)); if (bad) return toast('في لينك مش صحيح: '+bad);
+
+  // منع التكرار: نفس اللينك أو نفس العنوان موجود قبل كده
+  const mine = new Set(idea.links.map(normLink));
+  const dup = ideas.find(i => i.id!==editingId && (
+    (i.links||[]).some(l=>mine.has(normLink(l))) ||
+    i.title.trim()===idea.title));
+  if (dup && !confirm(`الفكرة دي شبه فكرة موجودة قبل كده (${dup.id}: ${dup.title})${dup.status===USED?' — واتستخدمت بالفعل':''}.\nتحبي تحفظيها برضه؟`)) return;
+
+  const btn=$('#submitBtn'); btn.disabled=true;
+  try{
+    const res = await api(editingId ? {action:'update', id:editingId, idea} : {action:'create', idea});
+    if (!res.ok) throw new Error(res.error||'حصل خطأ');
+    toast(editingId ? 'اتعدلت الفكرة ✓' : 'اتحفظت الفكرة ✓');
+    resetForm(); await load();
+  }catch(err){ toast(err.message||'تعذر الحفظ، جربي تاني'); }
+  finally{ btn.disabled=false; }
+});
+$('#addLink').onclick=()=>addLinkRow();
+$('#cancelEdit').onclick=resetForm;
+
+/* ---------- القائمة ---------- */
+async function load(){
+  try{
+    const res = await api();
+    if (!res.ok) throw new Error(res.error);
+    ideas = (res.ideas||[]).sort((a,b)=> (a.status===USED)-(b.status===USED) || String(b.created_at).localeCompare(String(a.created_at)));
+  }catch(err){ toast('تعذر تحميل الأفكار'); }
+  render();
+}
+function render(){
+  const q=$('#search').value.trim().toLowerCase(), ft=$('#fType').value, fs=$('#fStatus').value;
+  const used = ideas.filter(i=>i.status===USED).length;
+  $('#tabCount').textContent = ideas.length ? `(${ideas.length})` : '';
+  $('#stats').innerHTML = `<div class="stat">الكل<b>${ideas.length}</b></div><div class="stat">جديدة<b>${ideas.length-used}</b></div><div class="stat">مستخدمة<b>${used}</b></div>`;
+  const rows = ideas.filter(i =>
+    (!ft || i.type===ft) && (!fs || (fs===USED ? i.status===USED : i.status!==USED)) &&
+    (!q || [i.title,i.description,i.notes,i.id].join(' ').toLowerCase().includes(q)));
+  if (!rows.length){ $('#list').innerHTML = `<div class="empty">${ideas.length?'مفيش نتائج للبحث ده':'لسه مفيش أفكار — ابدئي بأول فكرة 🙂'}</div>`; return; }
+  $('#list').innerHTML = rows.map(i => {
+    const isUsed = i.status===USED;
+    return `<article class="idea ${isUsed?'used':''}">
+      <div class="idea-top"><span class="chip">${esc(i.type)}</span><span class="id">${esc(i.id)}</span>
+        <span class="status ${isUsed?'used':'new'}">${isUsed?'🔒 مستخدمة':'جديدة'}</span></div>
+      <h3>${esc(i.title)}</h3>
+      ${i.description?`<p>${esc(i.description)}</p>`:''}
+      ${i.notes?`<p class="notes">ملاحظة: ${esc(i.notes)}</p>`:''}
+      ${(i.links||[]).length?`<div class="links">${i.links.map(l=>isUrl(l)?`<a href="${esc(l)}" target="_blank" rel="noopener">${esc(linkLabel(l))} ↗</a>`:'').join('')}</div>`:''}
+      ${isUsed?`<div class="lockline">اتستخدمت${i.used_in?` في: <b>${esc(i.used_in)}</b>`:''}${i.used_at?` — ${fmtDate(i.used_at)}`:''}. الفكرة مقفولة ومينفعش تتعدل.</div>`:''}
+      <div class="meta"><span>أُضيفت ${fmtDate(i.created_at)}</span>
+        ${isUsed?'':`<span class="row-actions"><button class="btn btn-sm" data-edit="${esc(i.id)}">تعديل</button><button class="btn btn-sm btn-danger" data-del="${esc(i.id)}">حذف</button></span>`}
+      </div></article>`;
+  }).join('');
+}
+$('#list').addEventListener('click', async e => {
+  const ed=e.target.dataset.edit, del=e.target.dataset.del;
+  if (ed){
+    const i=ideas.find(x=>x.id===ed); if(!i||i.status===USED) return;
+    editingId=i.id; $('#editingId').textContent=i.id; $('#editingNote').classList.remove('hidden');
+    document.querySelectorAll('input[name=type]').forEach(r=>r.checked=r.value===i.type);
+    $('#title').value=i.title; $('#description').value=i.description||''; $('#notes').value=i.notes||'';
+    $('#links').innerHTML=''; (i.links&&i.links.length?i.links:['']).forEach(addLinkRow);
+    $('#submitBtn').textContent='حفظ التعديل'; switchTab('add'); window.scrollTo({top:0,behavior:'smooth'});
+  }
+  if (del){
+    if (!confirm('متأكدة إنك عايزة تمسحي الفكرة دي؟')) return;
+    const res=await api({action:'delete', id:del});
+    toast(res.ok?'اتمسحت الفكرة':(res.error||'تعذر الحذف')); load();
+  }
+});
+['#search','#fType','#fStatus'].forEach(s=>$(s).addEventListener('input',render));
+
+/* ---------- التبويبات ---------- */
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.dataset.tab===name));
+  $('#tab-add').classList.toggle('hidden', name!=='add');
+  $('#tab-list').classList.toggle('hidden', name!=='list');
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{ switchTab(t.dataset.tab); if(t.dataset.tab==='list') load(); });
+
+/* ---------- تشغيل ---------- */
+if (DEMO) $('#demoBanner').classList.remove('hidden');
+buildTypes(); addLinkRow(); load();
+</script>
+</body>
+</html>
