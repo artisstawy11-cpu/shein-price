@@ -21,6 +21,8 @@
   --bg:#18131a; --surface:#221b24; --fg:#f2eaf0; --muted:#a99cab; --line:#3a2f3c;
   --accent:#e58bb8; --accent-soft:#3a2333; --ok:#5fd19d; --danger:#ff8a80; --field:#1c161e; color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+#openSettings[aria-expanded="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
 .wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
@@ -316,7 +318,7 @@ $("add").onclick=()=>{cur().items.push({name:"",price:0,qty:1});renderItems()};
 $("cname").addEventListener("input",()=>{cur().name=$("cname").value;calc()});
 document.querySelectorAll('input[name=dep]').forEach(r=>r.addEventListener("change",()=>{cur().dep=+r.value;calc()}));
 SKEYS.forEach(k=>$(k).addEventListener("input",calc));
-const toggleSettings=open=>{$("settings").hidden=!open;$("openSettings").setAttribute("aria-expanded",open)};
+const toggleSettings=open=>{$("settings").hidden=!open;$("openSettings").setAttribute("aria-expanded",open);$("openSettings").textContent=open?"✕ إخفاء الإعدادات":"⚙️ الإعدادات وبيانات الدفع"};
 $("openSettings").onclick=()=>toggleSettings($("settings").hidden);
 $("closeSettings").onclick=()=>toggleSettings(false);
 $("resetSettings").onclick=()=>{SKEYS.forEach(k=>$(k).value=DEFAULTS[k]);calc()};
