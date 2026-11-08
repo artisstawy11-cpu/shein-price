@@ -126,7 +126,7 @@ input[type=url]{direction:ltr;text-align:left}
       <div id="links"></div>
       <button type="button" class="btn btn-ghost" id="addLink">+ إضافة لينك</button>
 
-      <label>صور تصوّرية <span class="hint">(اختياري، لحد 10 صور: سكرينشوت، لوكات، ألوان…)</span></label>
+      <label>صور تصوّرية <span class="hint">(اختياري، من غير حد أقصى: سكرينشوت، لوكات، ألوان…)</span></label>
       <label class="drop" id="drop">📷 اضغطي هنا أو اسحبي الصور
         <input type="file" id="imgInput" accept="image/*" multiple>
       </label>
@@ -172,7 +172,6 @@ const DEMO = !API_URL;
 let ideas = [];
 let editingId = null;
 let images = []; // [{name, type, data, preview}]
-const MAX_IMAGES = 10;
 const $ = s => document.querySelector(s);
 
 /* ---------- API ---------- */
@@ -197,8 +196,14 @@ function demoApi(p){
     if (!p) return res({ok:true, ideas: JSON.parse(JSON.stringify(demoData))});
     if (p.action === 'create'){
       const n = demoData.reduce((m,i)=>Math.max(m, +i.id.split('-')[1]),0)+1;
-      demoData.push({...p.idea, id:'SH-'+String(n).padStart(3,'0'), created_at:new Date().toISOString(), status:'جديدة', used_in:'', used_at:'', folder:(p.images||[]).length?'https://drive.google.com/drive/folders/demo':''});
-      return res({ok:true});
+      const id='SH-'+String(n).padStart(3,'0');
+      demoData.push({...p.idea, id, created_at:new Date().toISOString(), status:'جديدة', used_in:'', used_at:'', folder:''});
+      return res({ok:true, id});
+    }
+    if (p.action === 'addImage'){
+      const it = demoData.find(i => i.id === p.id);
+      if (!it || it.status === USED) return res({ok:false, error:'مقفولة'});
+      it.folder = 'https://drive.google.com/drive/folders/demo'; return res({ok:true, folder: it.folder});
     }
     const it = demoData.find(i => i.id === p.id);
     if (!it) return res({ok:false, error:'الفكرة غير موجودة'});
@@ -254,9 +259,8 @@ function compress(file){
 }
 async function addFiles(files){
   const list = [...files].filter(f => /^image\//.test(f.type));
-  const room = MAX_IMAGES - images.length;
-  if (list.length > room) toast(`أقصى عدد ${MAX_IMAGES} صور، اتضاف أول ${Math.max(room,0)} بس`);
-  for (const f of list.slice(0, Math.max(room,0))){
+  if (list.length > 3) toast(`جاري تجهيز ${list.length} صورة…`);
+  for (const f of list){
     try{ images.push(await compress(f)); }catch(err){ toast(err.message); }
   }
   renderThumbs();
@@ -314,12 +318,32 @@ $('#ideaForm').addEventListener('submit', async e => {
   if (dup && !confirm(`الفكرة دي شبه فكرة موجودة قبل كده (${dup.id}: ${dup.title})${dup.status===USED?' — واتستخدمت بالفعل':''}.\nتحبي تحفظيها برضه؟`)) return;
 
   const btn=$('#submitBtn'), label=btn.textContent; btn.disabled=true;
-  if (images.length) btn.textContent='جاري رفع الصور…';
   try{
-    const imgs = images.map(({name,type,data})=>({name,type,data}));
-    const res = await api(editingId ? {action:'update', id:editingId, idea, images:imgs} : {action:'create', idea, images:imgs});
+    // 1) حفظ الفكرة نفسها
+    btn.textContent='جاري الحفظ…';
+    const wasEditing = !!editingId;
+    const res = await api(editingId ? {action:'update', id:editingId, idea} : {action:'create', idea});
     if (!res.ok) throw new Error(res.error||'حصل خطأ');
-    toast(editingId ? 'اتعدلت الفكرة ✓' : 'اتحفظت الفكرة ✓');
+    const id = editingId || res.id;
+    // 2) رفع الصور واحدة واحدة (عشان مفيش حد أقصى للعدد)
+    const failed = [];
+    for (let k=0; k<images.length; k++){
+      btn.textContent=`جاري رفع الصور ${k+1}/${images.length}…`;
+      const {name,type,data} = images[k];
+      try{
+        const r = await api({action:'addImage', id, image:{name,type,data}});
+        if (!r.ok) throw new Error(r.error);
+      }catch(err){ failed.push(images[k]); }
+    }
+    if (failed.length){
+      // نسيب الصور اللي مترفعتش، والفكرة تفضل مفتوحة للتعديل عشان تتجرب تاني
+      await load();
+      editingId=id; $('#editingId').textContent=idea.title; $('#editingNote').classList.remove('hidden');
+      images=failed; renderThumbs(); btn.textContent='حفظ التعديل';
+      toast(`اتحفظت الفكرة، بس ${failed.length} صورة مترفعتش. اضغطي حفظ تاني`);
+      return;
+    }
+    toast(wasEditing ? 'اتعدلت الفكرة ✓' : 'اتحفظت الفكرة ✓');
     resetForm(); await load();
   }catch(err){ toast(err.message||'تعذر الحفظ، جربي تاني'); btn.textContent=label; }
   finally{ btn.disabled=false; }
